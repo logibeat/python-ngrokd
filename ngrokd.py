@@ -56,7 +56,7 @@ def https_service(host, post, certfile=pemfile, keyfile=keyfile):
             try:
                 conn = context.wrap_socket(news, server_side=True)
                 logger = logging.getLogger('%s:%d' % ('https', conn.fileno()))
-                logger.debug('New Client to: %s:%d' % (addr[0], addr[1]))
+                logger.debug('New Https Client to: %s:%d' % (addr[0], addr[1]))
                 thread = threading.Thread(target = HttpHandlerServer, args = (conn, addr, 'https'))
                 thread.setDaemon(True)
                 thread.start()
@@ -81,7 +81,7 @@ def http_service(host, post):
             conn, addr = server.accept()
             try:
                 logger = logging.getLogger('%s:%d' % ('http', conn.fileno()))
-                logger.debug('New Client to: %s:%d' % (addr[0], addr[1]))
+                logger.debug('New Http Client to: %s:%d' % (addr[0], addr[1]))
                 thread = threading.Thread(target = HttpHandlerServer, args = (conn, addr, 'http'))
                 thread.setDaemon(True)
                 thread.start()
@@ -109,7 +109,7 @@ def service(host, post, certfile=pemfile, keyfile=keyfile):
             try:
                 conn = context.wrap_socket(news, server_side=True)
                 logger = logging.getLogger('%s:%d' % ('service', conn.fileno()))
-                logger.debug('New Client to: %s:%d' % (addr[0], addr[1]))
+                logger.debug('New Tcp Client to: %s:%d' % (addr[0], addr[1]))
                 thread = threading.Thread(target = HKServer, args = (conn, addr, 'service'))
                 thread.setDaemon(True)
                 thread.start()
