@@ -8,10 +8,10 @@ Docker
 
 # 运行方法
 ngrokd.py 配置后,在docker中build,然后compose.
-···
+```
 docker build -t python-ngrokd .
 docker-compose up -d
-···
+```
 
 # 温馨提示
 如果有小伙伴不想依赖环境运行，不妨可以试下PyInstaller，把py编译成可执行文件。
