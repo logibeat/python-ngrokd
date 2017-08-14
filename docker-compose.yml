@@ -1,0 +1,8 @@
+version: '2'
+services:
+  Ngrokd:
+    image: python-ngrokd
+    ports:
+      - "19080:80"
+      - "19443:443"
+      - "19599:599"

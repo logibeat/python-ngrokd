@@ -13,8 +13,8 @@ Tunnels = dict()
 
 reglist = dict()
 
-# 服务端程序处理过程
-def HTServer(conn, addr, agre):
+# 服务端程序处理过程 - TCP
+def TcpHandlerServer(conn, addr, prot):
     global TCPS
     global reglist
     tosock = None
@@ -22,7 +22,7 @@ def HTServer(conn, addr, agre):
         try:
             if tosock is None:
                 rport = conn.getsockname()[1]
-                url = agre + '://' + SERVERDOMAIN + ':' + str(rport)
+                url = prot + '://' + SERVERDOMAIN + ':' + str(rport)
                 if url in TCPS:
                     info = TCPS[url]
 
@@ -53,21 +53,21 @@ def HTServer(conn, addr, agre):
 
     conn.close()
 
-# 服务端程序处理过程
-def HHServer(conn, addr, agre):
+# 服务端程序处理过程 - HTTP/HTTPS
+def HttpHandlerServer(conn, addr, prot):
     global HOSTS
     global reglist
     tosock = None
-    logger = logging.getLogger('%s:%d' % (agre, conn.fileno()))
+    logger = logging.getLogger('%s:%d' % (prot, conn.fileno()))
     while True:
         try:
             data = conn.recv(bufsize)
             if not data: break
 
             if tosock is None:
-                heads = httphead(data.decode('utf-8'))
+                heads = httpHeader(data.decode('utf-8'))
                 if 'Host' in heads:
-                    url = agre + '://' + heads['Host']
+                    url = prot + '://' + heads['Host']
                     if url in HOSTS:
                         info = HOSTS[url]
 
@@ -102,7 +102,7 @@ def HHServer(conn, addr, agre):
     conn.close()
 
 # 服务端程序处理过程
-def HKServer(conn, addr, agre):
+def HKServer(conn, addr, prot):
     global HOSTS
     global TCPS
     global Tunnels
@@ -111,7 +111,7 @@ def HKServer(conn, addr, agre):
     ClientId = ''
     pingtime = 0
     tosock = None
-    logger = logging.getLogger('%s:%d' % (agre, conn.fileno()))
+    logger = logging.getLogger('%s:%d' % (prot, conn.fileno()))
     while True:
         try:
             recvbut = conn.recv(bufsize)

@@ -4,10 +4,14 @@
 采用多线程异步处理，并发性能相当强悍！
 
 # 运行环境
-Python 2.7.9 或 Python 3.4.2 以上
+Docker
 
 # 运行方法
-ngrokd.py 配置后,直接运行即可.
+ngrokd.py 配置后,在docker中build,然后compose.
+···
+docker build -t python-ngrokd .
+docker-compose up -d
+···
 
 # 温馨提示
 如果有小伙伴不想依赖环境运行，不妨可以试下PyInstaller，把py编译成可执行文件。

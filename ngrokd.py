@@ -10,26 +10,26 @@ import time
 import logging
 import threading
 
-SERVERDOMAIN = 'ngrok.com' # 服务域名
+SERVERDOMAIN = 'me.logibeat.com' # 服务域名
 SERVERHOST = ''
 SERVERHTTP = 80
 SERVERHTTPS = 443
-SERVERPORT = 4443
+SERVERPORT = 599
 
 pemfile = 'snakeoil.crt' # 服务证书公钥
 keyfile = 'snakeoil.key' # 服务证书密钥
 
 bufsize = 1024*8 # 吞吐量
 
-logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s', datefmt='%Y/%m/%d %H:%M:%S')
+logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] [%(filename)s:%(lineno)d] [%(levelname)s] %(message)s', datefmt='%Y/%m/%d %H:%M:%S')
 
 def tcp_service(server, post):
-    from connt import HTServer
+    from connt import TcpHandlerServer
     try:
         while True:
             conn, addr = server.accept()
             try:
-                thread = threading.Thread(target = HTServer, args = (conn, addr, 'tcp'))
+                thread = threading.Thread(target = TcpHandlerServer, args = (conn, addr, 'tcp'))
                 thread.setDaemon(True)
                 thread.start()
             except Exception:
@@ -41,7 +41,7 @@ def tcp_service(server, post):
     server.close()
 
 def https_service(host, post, certfile=pemfile, keyfile=keyfile):
-    from connt import HHServer
+    from connt import HttpHandlerServer
     context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
     context.load_cert_chain(certfile=certfile, keyfile=keyfile)
     try:
@@ -50,14 +50,14 @@ def https_service(host, post, certfile=pemfile, keyfile=keyfile):
         server.bind((host, post))
         server.listen(5)
         server.setblocking(1)
-        logging.debug('[%s:%d] Service establishment success' % (host, post))
+        logging.debug('[%s:%d] Https Service establishment success' % (host, post))
         while True:
             news, addr = server.accept()
             try:
                 conn = context.wrap_socket(news, server_side=True)
                 logger = logging.getLogger('%s:%d' % ('https', conn.fileno()))
                 logger.debug('New Client to: %s:%d' % (addr[0], addr[1]))
-                thread = threading.Thread(target = HHServer, args = (conn, addr, 'https'))
+                thread = threading.Thread(target = HttpHandlerServer, args = (conn, addr, 'https'))
                 thread.setDaemon(True)
                 thread.start()
             except Exception:
@@ -69,20 +69,20 @@ def https_service(host, post, certfile=pemfile, keyfile=keyfile):
     server.close()
 
 def http_service(host, post):
-    from connt import HHServer
+    from connt import HttpHandlerServer
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server.bind((host, post))
         server.listen(5)
         server.setblocking(1)
-        logging.debug('[%s:%d] Service establishment success' % (host, post))
+        logging.debug('[%s:%d] Http Service establishment success' % (host, post))
         while True:
             conn, addr = server.accept()
             try:
                 logger = logging.getLogger('%s:%d' % ('http', conn.fileno()))
                 logger.debug('New Client to: %s:%d' % (addr[0], addr[1]))
-                thread = threading.Thread(target = HHServer, args = (conn, addr, 'http'))
+                thread = threading.Thread(target = HttpHandlerServer, args = (conn, addr, 'http'))
                 thread.setDaemon(True)
                 thread.start()
             except Exception:
@@ -103,7 +103,7 @@ def service(host, post, certfile=pemfile, keyfile=keyfile):
         server.bind((host, post))
         server.listen(5)
         server.setblocking(1)
-        logging.debug('[%s:%d] Service establishment success' % (host, post))
+        logging.debug('[%s:%d] Tcp Service establishment success' % (host, post))
         while True:
             news, addr = server.accept()
             try:
